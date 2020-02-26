@@ -1,0 +1,80 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+@Scripts.Render("~/bundles/jquery")
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: "/Home/GetTree",
+            success: function (response) {
+                var off = response.indexOf(":");
+                var height = 1;
+                if (off != -1) {
+                    height = Number(response.substring(0, off));
+                    response = response.substring(off + 1);
+                }
+                var s1 = '<svg xmlns="http://www.w3.org/2000/svg" ';
+                s1 += 'width="100%" height="' + (height*60) + '">';
+                var s2 = '</svg>';
+                var treestr = s1 + response + s2;
+                $("#treecontainer").html(treestr);
+            },
+            error: function (e) {
+                alert("Error: " + e.responseText);
+            }
+        });
+    });
+</script>
+
+
+<h2>@Html.Raw(ViewBag.Message)</h2>
+
+@{ using (Html.BeginForm())
+    {
+        string theNode = ViewBag.TheNode;
+
+        <div>
+            Node Value (Name): @Html.TextBox("Node", @theNode)
+        </div>
+        <hr />
+        <div>
+            <input type="submit" name="button" value="Add" />
+            <input type="submit" name="button" value="Remove" />
+            <input type="submit" name="button" value="In Order" />
+            <input type="submit" name="button" value="Pre Order" />
+            <input type="submit" name="button" value="Post Order" />
+        </div>
+        <hr />
+        <div>
+            @{
+                string orderStr = ViewBag.OrderType + ":";
+                int cnt = 1;
+                <h3>@orderStr</h3>
+                <blockquote>
+                    @foreach (var item in ViewBag.OrderList)
+                    {
+                        string lsVal = "" + item;
+                        if (cnt++ < ViewBag.Count)
+                        {
+                            lsVal += ", ";
+                        }
+                        @lsVal
+
+                    }
+
+                    @if (ViewBag.Count == 0)
+                    {
+                        <div>
+                            [ None ]
+                        </div>
+                    }
+                </blockquote>
+            }
+        </div>
+        <hr />
+        <div id="treecontainer">
+        </div>
+        <hr />
+                }
+}
